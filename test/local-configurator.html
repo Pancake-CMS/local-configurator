@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>paper-button basic tests</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+
+    <link rel="import" href="../local-configurator.html">
+
+  </head>
+
+  <body>
+    <test-fixture id="configurator">
+      <template>
+        <local-configurator></local-configurator>
+      </template>
+    </test-fixture>
+
+    <script>
+      suite('<local-configurator>', function() {
+
+        setup(function() {
+          localStorage.removeItem('config');
+          configurator = fixture('configurator');
+        });
+
+        test('Can save config', function() {
+          var userConfigValue = {
+          	"pancakeConfig": {
+          		"authDomain": "__YOUR_AUTH_DOMAIN__",
+          		"databaseUrl": "__YOUR_DATABASE_URL__",
+          		"firebaseApiKey": "__YOUR_API_KEY__"
+          	}
+          };
+          configurator.$.config.value = JSON.stringify(userConfigValue);
+          configurator.$.uploadButton.click();
+
+          expect(configurator.isEmpty).to.be.false;
+        });
+
+        test('Can identify empty config', function() {
+          var userConfigValue = "{}";
+          configurator.$.config.value = userConfigValue;
+          configurator.parseConfig();
+
+          expect(configurator.isEmpty).to.be.true;
+        });
+
+        test('Can identify invalid config', function() {
+          var userConfigValue = "{' ddd}";
+          configurator.$.config.value = userConfigValue;
+          configurator.parseConfig();
+
+          expect(configurator.isEmpty).to.be.true;
+          expect(configurator.$.config.invalid).to.be.invalid;
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,89 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-input/paper-textarea.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../iron-localstorage/iron-localstorage.html">
+
+<dom-module id="local-configurator">
+  <template>
+    <style>
+      :host {
+        width: 100%;
+        display: block;
+      }
+      paper-button {
+        position: absolute;
+        right: 0;
+        margin-top: 20px;
+      }
+
+      p > span {
+        border: 1px solid #ebebeb;
+        background: #f9f5f5;
+        font-size: 10px;
+        padding: 3px 5px;
+      }
+    </style>
+    <iron-localstorage name="pancake-config"
+      value="{{config}}"
+      on-iron-localstorage-load-empty="handleNoConfig"
+      ></iron-localstorage>
+    <template is="dom-if" if="{{isEmpty}}">
+      <p>Config Values are missing. Please ask your admin for the <span>config.json</span> file.</p>
+    </template>
+    <paper-textarea
+      errorMessage="The config file could not be parsed. Please confirm if it follows proper JSON formatting."
+      label="Paste Config File Content"
+      id="config" value="{{config}}"></paper-textarea>
+    <paper-button id="uploadButton" raised on-click="parseConfig">Upload Config</paper-button>
+  </template>
+  <script>
+    Polymer({
+      is: 'local-configurator',
+
+      properties: {
+        config: {
+          type: Object,
+          notify: true
+        },
+
+        isEmpty: {
+          type: Boolean,
+          notify: true,
+          value: false
+        }
+      },
+
+      ready: function() {
+        if(this.config) {
+          this.parseConfig();
+        }
+      },
+
+      /*
+       *  Parses the config file added by the user
+       */
+      parseConfig: function() {
+        try{
+          this.$.config.invalid = false;
+          var parsedConfig = JSON.parse(this.config);
+          if(Object.keys(parsedConfig).length > 0) {
+            this.isEmpty = false;
+            return;
+          }
+          this.handleInvalidValues();
+        } catch (e) {
+          this.handleInvalidValues();
+        }
+      },
+
+      handleInvalidValues: function () {
+        this.isEmpty = true;
+        this.$.config.invalid = true;
+      },
+
+      handleNoConfig: function() {
+        this.isEmpty = true;
+      }
+    });
+  </script>
+</dom-module>
