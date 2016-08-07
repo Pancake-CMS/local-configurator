@@ -73,6 +73,9 @@
           var parsedConfig = JSON.parse(this.config);
           if(Object.keys(parsedConfig).length > 0) {
             this.isEmpty = false;
+            this.fire('local-configurator-changed', {
+              config: parsedConfig.pancakeConfig
+            });
             return;
           }
           this.handleInvalidValues();
@@ -84,10 +87,13 @@
       handleInvalidValues: function () {
         this.isEmpty = true;
         this.$.config.invalid = true;
+        this.fire('local-configurator-changed',{
+          config: ""
+        });
       },
 
       handleNoConfig: function() {
-        this.isEmpty = true;
+        this.handleInvalidValues();
       }
     });
   </script>
