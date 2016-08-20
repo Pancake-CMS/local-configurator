@@ -23,10 +23,12 @@
       suite('<local-configurator>', function() {
 
         setup(function() {
+          localStorage.removeItem('userconfig');
           localStorage.removeItem('config');
           configurator = fixture('configurator');
         });
 
+        // checks if config can be saved properly
         test('Can save config', function() {
           var userConfigValue = {
           	"pancakeConfig": {
@@ -35,27 +37,30 @@
           		"firebaseApiKey": "__YOUR_API_KEY__"
           	}
           };
-          configurator.$.config.value = JSON.stringify(userConfigValue);
+          configurator.$.userconfig.value = JSON.stringify(userConfigValue);
           configurator.$.uploadButton.click();
 
           expect(configurator.isEmpty).to.be.false;
+          expect(configurator.config).to.not.be.equal({});
         });
 
+        // checks if it can identify what an empty config is
         test('Can identify empty config', function() {
           var userConfigValue = "{}";
-          configurator.$.config.value = userConfigValue;
+          configurator.$.userconfig.value = userConfigValue;
           configurator.parseConfig();
 
           expect(configurator.isEmpty).to.be.true;
         });
 
+        // checks if it can identify what a wrong config is
         test('Can identify invalid config', function() {
           var userConfigValue = "{' ddd}";
-          configurator.$.config.value = userConfigValue;
+          configurator.$.userconfig.value = userConfigValue;
           configurator.parseConfig();
 
           expect(configurator.isEmpty).to.be.true;
-          expect(configurator.$.config.invalid).to.be.invalid;
+          expect(configurator.$.userconfig.invalid).to.be.invalid;
         });
       });
     </script>

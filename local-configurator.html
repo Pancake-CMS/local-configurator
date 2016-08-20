@@ -30,22 +30,31 @@
     </style>
     <iron-localstorage name="pancake-config"
       value="{{config}}"
+      ></iron-localstorage>
+
+    <iron-localstorage name="pancake-userconfig"
+      value="{{userconfig}}"
       on-iron-localstorage-load-empty="handleNoConfig"
       ></iron-localstorage>
     <template is="dom-if" if="{{isEmpty}}">
       <p>Config Values are missing. Please ask your admin for the <span>config.json</span> file.</p>
     </template>
     <paper-textarea
-      errorMessage="The config file could not be parsed. Please confirm if it follows proper JSON formatting."
+      error-message="The config file could not be parsed. Please confirm if it follows proper JSON formatting."
       label="Paste Config File Content"
-      id="config" value="{{config}}"></paper-textarea>
-    <paper-button id="uploadButton" raised on-click="parseConfig">Upload Config</paper-button>
+      id="userconfig" value="{{userconfig}}"></paper-textarea>
+    <paper-button id="uploadButton" raised on-click="parseConfig">Reload page with updated config</paper-button>
   </template>
   <script>
     Polymer({
       is: 'local-configurator',
 
       properties: {
+        userconfig: {
+          type: String,
+          notify: true
+        },
+
         config: {
           type: Object,
           notify: true
@@ -59,7 +68,7 @@
       },
 
       ready: function() {
-        if(this.config) {
+        if(this.userconfig) {
           this.parseConfig();
         }
       },
@@ -69,13 +78,12 @@
        */
       parseConfig: function() {
         try{
-          this.$.config.invalid = false;
-          var parsedConfig = JSON.parse(this.config);
+          this.$.userconfig.invalid = false;
+          var parsedConfig = JSON.parse(this.userconfig);
           if(Object.keys(parsedConfig).length > 0) {
             this.isEmpty = false;
-            this.fire('local-configurator-changed', {
-              config: parsedConfig.pancakeConfig
-            });
+            this.config = parsedConfig;
+            window.location.reload();
             return;
           }
           this.handleInvalidValues();
@@ -86,10 +94,7 @@
 
       handleInvalidValues: function () {
         this.isEmpty = true;
-        this.$.config.invalid = true;
-        this.fire('local-configurator-changed',{
-          config: ""
-        });
+        this.$.userconfig.invalid = true;
       },
 
       handleNoConfig: function() {

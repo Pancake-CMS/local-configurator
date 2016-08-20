@@ -15,6 +15,4 @@ bower install --save pancake-cms-local-configurator
 
 ### Attributes
 
-| name | type | description |
-|------|------|-------------|
-| mode | String | The mode of authentication supported by the organization |
+There are no attributes used for this element
